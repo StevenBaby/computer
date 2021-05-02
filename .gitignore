@@ -102,3 +102,7 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+x86_assembly/hello.bin
+x86_assembly/master.img
+x86_assembly/master.vmdk
+x86_assembly/bx_enh_dbg.ini
