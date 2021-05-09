@@ -1,6 +1,6 @@
 
-boot.bin: boot.asm
-	nasm boot.asm -o boot.bin
+%.bin: %.asm
+	nasm $< -o $@
 
 master.img: boot.bin
 	dd if=boot.bin of=master.img bs=512 count=1 conv=notrunc
