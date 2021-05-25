@@ -7,6 +7,7 @@ master.img: boot.bin
 
 .PHONY:bochs
 bochs: master.img
+	rm -rf bx_enh_dbg.ini
 	bochs -q -unlock
 
 .PHONY:clean

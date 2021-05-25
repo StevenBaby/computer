@@ -5,63 +5,62 @@ int 0x10 ; 将显示模式设置成文本模式
 
 xchg bx, bx
 
-offset equ 0x0000
-data equ 0x55aa
+; mov ax, 5
+; mov bx, 6
+; add ax, bx; ax = ax + bx
 
-mov ax, 0x1000
-mov ds, ax
+; add word [number], 5
 
-mov al, 0x10
-mov ah, 0x10
-mov ax, data
+; sub ax, bx
 
-mov ax, [offset] ; 0x1000 * 0x10 + 0 = 0x100000
-mov [offset], ax;
+; mov ax, 0xffff
+; mov bx, 5
+; add ax, bx
 
-; dd 0xffeeffee
+mov ax, 5
+mov bx, 7
+mul bx; dx : ax = bx * ax
 
-mov byte [offset], 0x10
-mov word [offset], 0x10
-mov dword [offset], 0xaa55eedd
+; dx : ax / oper = ax 商 - dx 余数
 
-; bx bp si di
+mov bx, 4
+div bx
+; ax 8, dx - 3
 
-mov ax, [bx];  [ds * 16 + bx]
-mov ax, [bp]; [ss * 16 + bp]
-mov ax, [si]; [ds * 16 + bp]
-mov ax, [di]; [ds * 16 + bp]
+; 异常
 
-mov ax, [bx + si + 0x100] ; ds
-mov ax, [bp + si + 0x100] ; ss
-mov ax, [bp + di + 0x100]
+; adc
+; 16 
 
-; mov ax, 0xb800
-; mov es, ax
+clc;
 
-; mov ax, 0
-; mov ds, ax
+mov ax, [number1]
+mov bx, [number2]
+add ax, bx
+mov [sum], ax
 
-; mov si, message
-; mov di, 0
-; mov cx, (message_end - message)
+mov ax, [number1 + 2]
+mov bx, [number2 + 2]
+adc ax, bx
+mov [sum + 2], ax
 
-; loop1:
-;     mov al, [ds:si]
-;     mov [es:di], al
+; sbb
 
-;     ; add si, 1
-;     inc si
-;     add di, 2
-
-;     loop loop1
+; 82 1000_0010
+; 13 0001_0011
 
 halt:
     jmp halt
 
-; message:
-;     db "hello, world!!!", 0
-; message_end:
+; number:
+;     dw 0x3456
 
+number1:
+    dd 0xcfff_ffff
+number2:
+    dd 4
+sum:
+    dd 0x0000_0000
 
 times 510 - ($ - $$) db 0
 db 0x55, 0xaa
