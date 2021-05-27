@@ -125,3 +125,12 @@ f_e 0xfe
 | 不低于等于 | Not Below or Equal   | jnbe | CF = 0 and ZF = 0   |
 | 偶         | Parity Even          | jpe  | PF = 1              |
 | 奇         | Parity Odd           | jpo  | PF = 0              |
+
+
+## 堆栈和函数
+
+程序的指令的地址 cs:ip
+
+栈顶的指针 ss:sp
+
+push / pop
