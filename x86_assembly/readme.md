@@ -134,3 +134,50 @@ f_e 0xfe
 栈顶的指针 ss:sp
 
 push / pop
+
+
+## 内中断和异常
+
+远调用
+
+jmp short start 占用两个字节，jmp 偏移数量，-128 - 127
+jmp near start 占三个字节 -32768 - 32767
+jmp far
+
+call function; push ip ; jmp function
+call far function; push cs; push ip; jmp function
+<!-- cs ip 64KB -->
+
+内中断
+
+### 内存布局
+
+| 起始地址  | 结束地址  | 大小     | 用途               |
+| --------- | --------- | -------- | ------------------ |
+| `0x000`   | `0x3FF`   | 1KB      | 中断向量表         |
+| `0x400`   | `0x4FF`   | 256B     | BIOS 数据区        |
+| `0x500`   | `0x7BFF`  | 29.75 KB | 可用区域           |
+| `0x7C00`  | `0x7DFF`  | 512B     | MBR 加载区域       |
+| `0x7E00`  | `0x9FBFF` | 607.6KB  | 可用区域           |
+| `0x9FC00` | `0x9FFFF` | 1KB      | 扩展 BIOS 数据区   |
+| `0xA0000` | `0xAFFFF` | 64KB     | 用于彩色显示适配器 |
+| `0xB0000` | `0xB7FFF` | 32KB     | 用于黑白显示适配器 |
+| `0xB8000` | `0xBFFFF` | 32KB     | 用于文本显示适配器 |
+| `0xC0000` | `0xC7FFF` | 32KB     | 显示适配器 BIOS    |
+| `0xC8000` | `0xEFFFF` | 160KB    | 映射内存           |
+| `0xF0000` | `0xFFFEF` | 64KB-16B | 系统 BIOS          |
+| `0xFFFF0` | `0xFFFFF` | 16B      | 系统 BIOS 入口地址 |
+
+0x000 - 0x3ff -> 0x400
+
+4B
+
+0x400 / 4 = 0x100 -> 256
+
+0 - 255
+
+0 除法异常 0 - 3
+
+0x80 * 4, 0x80 * 4 + 3
+
+0x80 linux 系统调用，软中断
