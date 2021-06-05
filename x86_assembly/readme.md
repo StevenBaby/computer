@@ -181,3 +181,15 @@ call far function; push cs; push ip; jmp function
 0x80 * 4, 0x80 * 4 + 3
 
 0x80 linux 系统调用，软中断
+
+
+## 逻辑运算指令
+
+- AND - TEST / SUB - CMP
+- OR
+- NOT
+- XOR
+
+- SHL / SHR
+- ROL / ROR
+- RCL / RCR
