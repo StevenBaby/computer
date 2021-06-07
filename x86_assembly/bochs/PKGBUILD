@@ -1,0 +1,61 @@
+# Maintainer: Kyle Keen <keenerd@gmail.com>
+# Contributor: Tom Newsom <Jeepster@gmx.co.uk>
+# Contributor: Kevin Piche <kevin@archlinux.org>
+
+pkgname=bochs
+pkgver=2.6.11
+pkgrel=1
+pkgdesc="A portable x86 PC emulation software package, including GUI debugger"
+arch=('x86_64')
+url="http://bochs.sourceforge.net/"
+license=('LGPL')
+depends=('gcc-libs' 'libxrandr' 'libxpm' 'gtk2')
+source=("https://downloads.sourceforge.net/sourceforge/$pkgname/$pkgname-$pkgver.tar.gz"
+        "fix-build.patch")
+sha256sums=('63897b41fbbbdfb1c492d3c4dee1edb4224282a07bbdf442a4a68c19bcc18862'
+            'SKIP')
+
+prepare() {
+    cd "$srcdir/$pkgname-$pkgver"
+    # 4.X kernel is basically 3.20
+    sed -i 's/2\.6\*|3\.\*)/2.6*|3.*|4.*)/' configure*
+
+    patch -p1 < ../fix-build.patch # https://sourceforge.net/p/bochs/bugs/1411/
+}
+
+build() {
+    cd "$srcdir/$pkgname-$pkgver"
+
+    ./configure \
+        --prefix=/usr \
+        --without-wx \
+        --with-x11 \
+        --with-x \
+        --with-term \
+        --disable-docbook \
+        --enable-cpu-level=6 \
+        --enable-fpu \
+        --enable-3dnow \
+        --enable-disasm \
+        --enable-smp \
+        --enable-x86-64 \
+        --enable-avx \
+        --enable-evex \
+        --enable-long-phy-address \
+        --enable-disasm \
+        --enable-pcidev \
+        --enable-usb \
+        --enable-debugger \
+        --with-sdl \
+        --enable-x86-debugger \
+        --enable-all-optimizations \
+        --enable-plugins
+    sed -i 's/^LIBS = /LIBS = -lpthread/g' Makefile
+    make -j 1
+}
+
+package() {
+    cd "$srcdir/$pkgname-$pkgver"
+    make DESTDIR="$pkgdir" install
+    install -Dm644 .bochsrc "$pkgdir/etc/bochsrc-sample.txt"
+}

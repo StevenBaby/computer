@@ -1,0 +1,33 @@
+Description: Fix the build with SMP enabled
+Origin: https://sourceforge.net/p/bochs/code/13778/
+
+Index: bochs/bx_debug/dbg_main.cc
+===================================================================
+--- bochs/bx_debug/dbg_main.cc	(revision 13777)
++++ bochs/bx_debug/dbg_main.cc	(working copy)
+@@ -1494,11 +1494,11 @@
+ {
+   char cpu_param_name[16];
+ 
+-  Bit32u index = BX_ITLB_INDEX_OF(laddr);
++  Bit32u index = BX_CPU(dbg_cpu)->ITLB.get_index_of(laddr);
+   sprintf(cpu_param_name, "ITLB.entry%d", index);
+   bx_dbg_show_param_command(cpu_param_name, 0);
+ 
+-  index = BX_DTLB_INDEX_OF(laddr, 0);
++  index = BX_CPU(dbg_cpu)->DTLB.get_index_of(laddr);
+   sprintf(cpu_param_name, "DTLB.entry%d", index);
+   bx_dbg_show_param_command(cpu_param_name, 0);
+ }
+
+Index: bochs/gui/gtk_enh_dbg_osdep.cc
+===================================================================
+--- bochs/gui/gtk_enh_dbg_osdep.cc
++++ bochs/gui/gtk_enh_dbg_osdep.cc
+@@ -819,7 +819,7 @@ void ShowDListCols (int totcols)
+     while (++i < firsthide)
+         gtk_tree_view_column_set_visible(AllCols[i], TRUE);
+     while (i < 23)
+-        gtk_tree_view_column_set_visible(AllCols[i], FALSE);
++        gtk_tree_view_column_set_visible(AllCols[i++], FALSE);
+ }
