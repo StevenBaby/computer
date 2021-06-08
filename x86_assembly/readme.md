@@ -193,3 +193,43 @@ call far function; push cs; push ip; jmp function
 - SHL / SHR
 - ROL / ROR
 - RCL / RCR
+
+
+## 输入和输出
+
+输入输出指令，来控制硬件（外围设备）
+
+- 显示器 - 显卡
+- 硬盘
+- 键盘
+
+端口 / 映射内存，
+
+寄存器 / D 边沿触发器
+
+Intell 0-65535 0x0000 ~ 0xffff
+
+阴极射线管控制器
+
+CRT 地址端口 0x3D4 
+CRT 数据端口 0x3D5
+
+80 * 25 = 2000
+
+16 位 / 8 位
+
+16K 字符
+
+0 - 1999
+
+0x0E - 光标位置高八位
+0x0F - 光标位置第八位
+
+```s
+in al, dx; dx 端口号
+in ax, dx; ax/al 数
+out dx, al;
+out dx, ax;
+```
+
+ax 16 , al 8
