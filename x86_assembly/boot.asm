@@ -31,6 +31,7 @@ print:
     jz print_end
 
     mov [es:di], bl
+    mov byte [es:di + 1], 0xAC; 0b1010_1101; 0xAC
 
     inc si
     inc ax
