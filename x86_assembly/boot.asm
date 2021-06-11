@@ -1,5 +1,11 @@
 [org 0x7c00]
 
+CRT_ADDR_REG equ 0x3D4
+CRT_DATA_REG equ 0x3D5
+
+CRT_CURSOR_HIGH equ 0x0E
+CRT_CURSOR_LOW equ 0x0F
+
 mov ax, 3
 int 0x10 ; 将显示模式设置成文本模式
 
@@ -10,48 +16,88 @@ mov sp, 0x7c00 ; 初始化堆栈
 
 xchg bx, bx ; bochs 断点
 
-mov ax, 0x55aa; 0b_0101_0101_1010_1010
-mov bx, 0xaa55; 0b_1010_1010_0101_0101
-and ax, bx ; 0
+mov ax, 0xb800
+mov es, ax
 
-and word [data], bx
+mov si, message
 
-mov ax, 0x55aa
-or ax, bx; 0xffff
+print:
+    call get_cursor
+    mov di, ax
+    shl di, 1
 
-mov ax, 0x55aa
-not ax ; 0xaa55
+    mov bl, [si]
+    cmp bl, 0
+    jz print_end
 
-mov ax, 0xffff
-xor ax, bx ; 55aa
+    mov [es:di], bl
+    mov byte [es:di + 1], 0xAC; 0b1010_1101; 0xAC
 
-xor ax, ax; ax 寄存器清零
+    inc si
+    inc ax
+    call set_cursor
+    jmp print
 
-mov ax, 0b1111_0010;
-test ax, 0b0000_0010;
-test ax, 0b0000_1000;
-
-0x2 - 0b10
-0x46 - 0b_0100_0110
-
-xor ax, ax
-mov al, 0b1010_1010
-shl al, 3
-shr al, 2
-
-; 50 0b_0101_0000
-; 14 0b_0001_0100
-
-rol al, 4 ; 0100_0001
-clc; 0_0100_0001
-rcl al, 1; 0_1000_0010
+print_end:
 
 halt:
     hlt; 关闭 CPU，等待外中断的到来
     jmp halt
 
-data:
-    dw 0x55aa
+get_cursor:
+    ; 获取光标位置，返回值存储在 AX 寄存器中
+
+    push dx
+
+    mov dx, CRT_ADDR_REG
+    mov al, CRT_CURSOR_HIGH
+    out dx, al
+
+    mov dx, CRT_DATA_REG
+    in al, dx
+    shl ax, 8
+
+    mov dx, CRT_ADDR_REG
+    mov al, CRT_CURSOR_LOW
+    out dx, al
+
+    mov dx, CRT_DATA_REG
+    in al, dx
+
+    pop dx
+
+    ret
+
+set_cursor:
+    ; 设置光标位置，参数用 ax 传递
+    push dx
+    push bx
+
+    mov bx, ax
+
+    mov dx, CRT_ADDR_REG
+    mov al, CRT_CURSOR_LOW
+    out dx, al
+
+    mov dx, CRT_DATA_REG
+    mov al, bl
+    out dx, al
+
+    mov dx, CRT_ADDR_REG
+    mov al, CRT_CURSOR_HIGH
+    out dx, al
+
+    mov dx, CRT_DATA_REG
+    mov al, bh
+    out dx, al
+
+    pop bx
+    pop dx
+
+    ret
+
+message:
+    db "hello, world!!!", 0
 
 times 510 - ($ - $$) db 0
 db 0x55, 0xaa
