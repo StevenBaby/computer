@@ -263,3 +263,83 @@ ax 16 , al 8
 | 1   | 0     | 1    | Magenta | 洋红      |
 | 1   | 1     | 0    | Yellow  | 黄色      |
 | 1   | 1     | 1    | White   | 白色/灰色 |
+
+## 外中断和时钟
+
+- 内中断和异常
+- 输入和输出
+
+---
+
+CPU ---> 硬件，端口
+
+- 键盘
+- 鼠标
+
+---
+
+- 时钟信号/脉冲 - CPU 的脉搏
+- 时钟中断 - OS 的脉搏
+
+---
+
+8086
+
+- NMI Non Maskable Interrupt / 不可屏蔽中断
+- INTR Interrupt / 可屏蔽中断
+
+----
+
+8259 - 可编程中断控制器 / PIC Programmable Interrupt Controller
+
+- 主芯片 - 8 1
+- 从芯片 - 8 
+- 级联方式
+
+
+### 中断向量表
+
+| 向量 | 功能            |
+| ---- | --------------- |
+| 0    | 除法溢出        |
+| 1    | 单步 (用于调试) |
+| 2    | 非屏蔽中断 NMI  |
+| 3    | 断点 (用于调试) |
+| 4    | 溢出中断        |
+| 5    | 打印屏幕        |
+| 6-7  | 保留            |
+| 8    | 时钟            |
+| 9    | 键盘            |
+| A    | 保留            |
+| B    | 串行通信COM2    |
+| C    | 串行通信COM1    |
+| D    | 保留            |
+| E    | 软盘控制器      |
+| F    | 并行打印机      |
+
+| 端口 | 说明            | 标记       |
+| ---- | --------------- | ---------- |
+| 0x20 | 主 PIC 命令端口 | PIC_M_CMD  |
+| 0x21 | 主 PIC 数据端口 | PIC_M_DATA |
+| 0xA0 | 从 PIC 命令端口 | PIC_S_CMD  |
+| 0xA1 | 从 PIC 数据端口 | PIC_S_DATA |
+
+- ICW1 ~ ICW4 用于初始化 8259 initialization Command Words
+- OCW1 ~ OCW3 用于操作 8259 Operation Commands Words
+
+---
+
+- 向 OCW1 写入屏蔽字，打开时钟中断
+- sti 设置 CPU 允许外中断
+- 向 OCW2 写入 0x20, 表示中断处理完毕
+
+中断向量表
+
+中断函数指针数组
+
+- IF / CPU 的外中断开关
+- MASK 中断屏蔽开关 / 8259 总开关
+- 执行中的开关
+
+- <https://wiki.osdev.org/8259_PIC>
+- <https://pdos.csail.mit.edu/6.828/2005/readings/hardware/8259A.pdf>

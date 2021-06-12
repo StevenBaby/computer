@@ -1,10 +1,7 @@
 [org 0x7c00]
 
-CRT_ADDR_REG equ 0x3D4
-CRT_DATA_REG equ 0x3D5
-
-CRT_CURSOR_HIGH equ 0x0E
-CRT_CURSOR_LOW equ 0x0F
+PIC_M_CMD equ 0x20
+PIC_M_DATA equ 0x21
 
 mov ax, 3
 int 0x10 ; 将显示模式设置成文本模式
@@ -14,90 +11,70 @@ mov ds, ax
 mov ss, ax
 mov sp, 0x7c00 ; 初始化堆栈
 
-xchg bx, bx ; bochs 断点
+; xchg bx, bx ; bochs 断点
 
-mov ax, 0xb800
-mov es, ax
+mov word [8 * 4], clock
+mov word [8 * 4 + 2], 0
 
-mov si, message
+mov al, 0b1111_1110
+out PIC_M_DATA, al
 
-print:
-    call get_cursor
-    mov di, ax
-    shl di, 1
+sti; IF = 1 set interrupt
+; cli; clear interrupt
+; clc; clear carry
 
-    mov bl, [si]
-    cmp bl, 0
-    jz print_end
+loopa:
+    mov bx, 3
+    mov al, 'A'
+    call blink
+    jmp loopa
 
-    mov [es:di], bl
-    mov byte [es:di + 1], 0xAC; 0b1010_1101; 0xAC
 
-    inc si
-    inc ax
-    call set_cursor
-    jmp print
+    ; 0x206; 0b0010_0000_0110;
+clock:
+    ; push flags
+    ; push cs
+    ; push ip
+    ; 0x006; 0b0000_0000_0110
 
-print_end:
-
-halt:
-    hlt; 关闭 CPU，等待外中断的到来
-    jmp halt
-
-get_cursor:
-    ; 获取光标位置，返回值存储在 AX 寄存器中
-
-    push dx
-
-    mov dx, CRT_ADDR_REG
-    mov al, CRT_CURSOR_HIGH
-    out dx, al
-
-    mov dx, CRT_DATA_REG
-    in al, dx
-    shl ax, 8
-
-    mov dx, CRT_ADDR_REG
-    mov al, CRT_CURSOR_LOW
-    out dx, al
-
-    mov dx, CRT_DATA_REG
-    in al, dx
-
-    pop dx
-
-    ret
-
-set_cursor:
-    ; 设置光标位置，参数用 ax 传递
-    push dx
+    ; xchg bx, bx
     push bx
+    push ax
 
-    mov bx, ax
+    mov bx, 4
+    mov al, 'C'
+    call blink
 
-    mov dx, CRT_ADDR_REG
-    mov al, CRT_CURSOR_LOW
-    out dx, al
+    mov al, 0x20
+    out PIC_M_CMD, al
 
-    mov dx, CRT_DATA_REG
-    mov al, bl
-    out dx, al
-
-    mov dx, CRT_ADDR_REG
-    mov al, CRT_CURSOR_HIGH
-    out dx, al
-
-    mov dx, CRT_DATA_REG
-    mov al, bh
-    out dx, al
-
+    pop ax
     pop bx
-    pop dx
+    iret
 
-    ret
+blink:
+        push es
+        push dx
 
-message:
-    db "hello, world!!!", 0
+        mov dx, 0xb800
+        mov es, dx
+
+        shl bx, 1
+        mov dl, [es: bx]
+
+        cmp dl, ' '
+    jnz .set_space
+    .set_char:
+        mov [es:bx], al
+        jmp .done
+    .set_space:
+        mov byte [es:bx], ' '
+    .done:
+        shr bx, 1
+
+        pop dx
+        pop es
+        ret
 
 times 510 - ($ - $$) db 0
 db 0x55, 0xaa
