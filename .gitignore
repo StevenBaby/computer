@@ -1,10 +1,11 @@
 __pycache__/
 
-x86_assembly/*.bin
-x86_assembly/master.img
-x86_assembly/master.vmdk
-x86_assembly/bx_enh_dbg.ini
+x86_assembly/build/*.bin
+x86_assembly/build/master.img
+x86_assembly/build/master.vmdk
+x86_assembly/build/bx_enh_dbg.ini
+x86_assembly/build/master.img.lock
+
 x86_assembly/bochs/pkg
 x86_assembly/bochs/src
 x86_assembly/bochs/bochs-2.6.11*
-x86_assembly/master.img.lock
