@@ -11,70 +11,119 @@ mov ds, ax
 mov ss, ax
 mov sp, 0x7c00 ; 初始化堆栈
 
-; xchg bx, bx ; bochs 断点
+xchg bx, bx ; bochs 断点
 
-mov word [8 * 4], clock
-mov word [8 * 4 + 2], 0
+; 0 -> 0x1000
 
-mov al, 0b1111_1110
-out PIC_M_DATA, al
+mov dx, 0x1f2
+mov al, 1
+out dx, al; 设置扇区数量
 
-sti; IF = 1 set interrupt
-; cli; clear interrupt
-; clc; clear carry
+mov al, 0
 
-loopa:
-    mov bx, 3
-    mov al, 'A'
-    call blink
-    jmp loopa
+inc dx; 0x1f3
+out dx, al
+
+inc dx; 0x1f4
+out dx, al
+
+inc dx; 0x1f5
+out dx, al
+
+inc dx; 0x1f6
+mov al, 0b1110_0000
+out dx, al
+
+inc dx; 0x1f7
+mov al, 0x20; 读硬盘
+out dx, al
+
+.check_read_state:
+    nop
+    nop
+    nop ; 一点延迟
+
+    in al, dx
+    and al, 0b1000_1000
+    cmp al, 0b0000_1000
+    jnz .check_read_state
+
+mov ax, 0x100
+mov es, ax
+mov di, 0
+mov dx, 0x1f0
+
+read_loop:
+    nop
+    nop
+    nop
+
+    in ax, dx
+    mov [es:di], ax
+
+    add di, 2
+    cmp di, 512
+    jnz read_loop
+
+xchg bx, bx
+
+mov dx, 0x1f2
+mov al, 1
+out dx, al; 设置扇区数量
+
+mov al, 2
+
+inc dx; 0x1f3
+out dx, al
+
+mov al, 0
+
+inc dx; 0x1f4
+out dx, al
+
+inc dx; 0x1f5
+out dx, al
+
+inc dx; 0x1f6
+mov al, 0b1110_0000
+out dx, al
+
+inc dx; 0x1f7
+mov al, 0x30; 写硬盘
+out dx, al
 
 
-    ; 0x206; 0b0010_0000_0110;
-clock:
-    ; push flags
-    ; push cs
-    ; push ip
-    ; 0x006; 0b0000_0000_0110
+mov ax, 0x100
+mov es, ax
+mov di, 0
+mov dx, 0x1f0
 
-    ; xchg bx, bx
-    push bx
-    push ax
+write_loop:
+    nop
+    nop
+    nop
 
-    mov bx, 4
-    mov al, 'C'
-    call blink
+    mov ax, [es:di]
+    out dx, ax
 
-    mov al, 0x20
-    out PIC_M_CMD, al
+    add di, 2
+    cmp di, 512
+    jnz write_loop
 
-    pop ax
-    pop bx
-    iret
+mov dx, 0x1f7
+.check_write_state:
+    nop
+    nop
+    nop ; 一点延迟
 
-blink:
-        push es
-        push dx
+    in al, dx
+    and al, 0b1000_0000
+    cmp al, 0b1000_0000
+    jz .check_write_state
 
-        mov dx, 0xb800
-        mov es, dx
+xchg bx, bx
 
-        shl bx, 1
-        mov dl, [es: bx]
-
-        cmp dl, ' '
-    jnz .set_space
-    .set_char:
-        mov [es:bx], al
-        jmp .done
-    .set_space:
-        mov byte [es:bx], ' '
-    .done:
-        shr bx, 1
-
-        pop dx
-        pop es
-        ret
+jmp $
 
 times 510 - ($ - $$) db 0
 db 0x55, 0xaa
