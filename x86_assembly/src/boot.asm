@@ -13,117 +13,87 @@ mov sp, 0x7c00 ; 初始化堆栈
 
 xchg bx, bx ; bochs 断点
 
+mov edi, 0x1000
+mov ecx, 2
+mov bl, 4
+call read_disk
+
+xchg bx, bx;
+
+jmp 0:0x1000; 跳转到 loader
+
 ; 0 -> 0x1000
 
-mov dx, 0x1f2
-mov al, 1
-out dx, al; 设置扇区数量
+read_disk:
+    ; 读取硬盘
+    ; edi - 存储内存位置
+    ; ecx - 存储起始的扇区位置
+    ; bl - 存储扇区数量
+    pushad; ax, cx, dx, bx, sp, bp, si, di
+    ; pushad; ax, cx, dx, bx, sp, bp, si, di
 
-mov al, 0
+    mov dx, 0x1f2
+    mov al, bl
+    out dx, al; 设置扇区数量
 
-inc dx; 0x1f3
-out dx, al
+    mov al, cl
+    inc dx; 0x1f3
+    out dx, al; 起始扇区位置低八位
 
-inc dx; 0x1f4
-out dx, al
+    shr ecx, 8
+    mov al, cl
+    inc dx; 0x1f4
+    out dx, al; 起始扇区位置中八位
 
-inc dx; 0x1f5
-out dx, al
+    shr ecx, 8
+    mov al, cl
+    inc dx; 0x1f5
+    out dx, al; 起始扇区位置高八位
 
-inc dx; 0x1f6
-mov al, 0b1110_0000
-out dx, al
+    shr ecx, 8
+    and cl, 0b1111
 
-inc dx; 0x1f7
-mov al, 0x20; 读硬盘
-out dx, al
+    inc dx; 0x1f6
+    mov al, 0b1110_0000
+    or al, cl
+    out dx, al
 
-.check_read_state:
-    nop
-    nop
-    nop ; 一点延迟
+    inc dx; 0x1f7
+    mov al, 0x20; 读硬盘
+    out dx, al
 
-    in al, dx
-    and al, 0b1000_1000
-    cmp al, 0b0000_1000
-    jnz .check_read_state
+    .check:
+        nop
+        nop
+        nop ; 一点延迟
 
-mov ax, 0x100
-mov es, ax
-mov di, 0
-mov dx, 0x1f0
+        in al, dx
+        and al, 0b1000_1000
+        cmp al, 0b0000_1000
+        jnz .check
 
-read_loop:
-    nop
-    nop
-    nop
+    xor eax, eax
+    mov al, bl
+    mov dx, 256
+    mul dx; ax = bl * 256
 
-    in ax, dx
-    mov [es:di], ax
+    mov dx, 0x1f0
+    mov cx, ax
+    .readw:
+        nop
+        nop
+        nop
 
-    add di, 2
-    cmp di, 512
-    jnz read_loop
+        in ax, dx
+        mov [edi], ax
+        add edi, 2
 
-xchg bx, bx
+        loop .readw
 
-mov dx, 0x1f2
-mov al, 1
-out dx, al; 设置扇区数量
+    popad
+    ; popa
 
-mov al, 2
-
-inc dx; 0x1f3
-out dx, al
-
-mov al, 0
-
-inc dx; 0x1f4
-out dx, al
-
-inc dx; 0x1f5
-out dx, al
-
-inc dx; 0x1f6
-mov al, 0b1110_0000
-out dx, al
-
-inc dx; 0x1f7
-mov al, 0x30; 写硬盘
-out dx, al
-
-
-mov ax, 0x100
-mov es, ax
-mov di, 0
-mov dx, 0x1f0
-
-write_loop:
-    nop
-    nop
-    nop
-
-    mov ax, [es:di]
-    out dx, ax
-
-    add di, 2
-    cmp di, 512
-    jnz write_loop
-
-mov dx, 0x1f7
-.check_write_state:
-    nop
-    nop
-    nop ; 一点延迟
-
-    in al, dx
-    and al, 0b1000_0000
-    cmp al, 0b1000_0000
-    jz .check_write_state
-
-xchg bx, bx
-
-jmp $
+    ret
 
 times 510 - ($ - $$) db 0
 db 0x55, 0xaa
