@@ -1,24 +1,22 @@
 [org 0x7c00]
 
-PIC_M_CMD equ 0x20
-PIC_M_DATA equ 0x21
-
 mov ax, 3
 int 0x10 ; 将显示模式设置成文本模式
 
 mov ax, 0
 mov ds, ax
+mov es, ax
 mov ss, ax
 mov sp, 0x7c00 ; 初始化堆栈
 
-xchg bx, bx ; bochs 断点
+; xchg bx, bx ; bochs 断点
 
 mov edi, 0x1000
 mov ecx, 2
 mov bl, 4
 call read_disk
 
-xchg bx, bx;
+; xchg bx, bx;
 
 jmp 0:0x1000; 跳转到 loader
 
@@ -62,6 +60,24 @@ read_disk:
     mov al, 0x20; 读硬盘
     out dx, al
 
+    xor ecx, ecx
+    mov cl, bl
+
+.read:
+    push cx
+    call .waits
+    call .reads
+    pop cx 
+    loop .read
+
+    popad
+    ; popa
+
+    ret
+
+
+.waits:
+    mov dx, 0x1f7
     .check:
         nop
         nop
@@ -71,14 +87,11 @@ read_disk:
         and al, 0b1000_1000
         cmp al, 0b0000_1000
         jnz .check
+    ret
 
-    xor eax, eax
-    mov al, bl
-    mov dx, 256
-    mul dx; ax = bl * 256
-
+.reads:
     mov dx, 0x1f0
-    mov cx, ax
+    mov cx, 256; 一个扇区 256 个字
     .readw:
         nop
         nop
@@ -89,10 +102,6 @@ read_disk:
         add edi, 2
 
         loop .readw
-
-    popad
-    ; popa
-
     ret
 
 times 510 - ($ - $$) db 0
