@@ -1,6 +1,6 @@
 # computer - 计算机体系结构
 
-![本项目地址](https://github.com/StevenBaby/computer)
+[本项目地址](https://github.com/StevenBaby/computer)
 
 ## 一个8位二进制CPU的设计和实现
 
