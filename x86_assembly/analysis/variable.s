@@ -1,67 +1,20 @@
 	.file	"variable.c"
 	.text
+	.globl	main
+	.type	main, @function
+main:
+	pushl	%ebp
+	movl	%esp, %ebp # 保存栈顶指针
 
-	.globl	a
-	.bss
-	.align 4
-	.type	a, @object
-	.size	a, 4
-a:
-	.zero	4
+	subl	$8, %esp # 在栈中预留8个字节
 
-	.globl	b
-	.align 4
-	.type	b, @object
-	.size	b, 4
-b:
-	.zero	4
+	movl	$0, -8(%ebp)  # int a = 0;
+	movl	$5, -4(%ebp)  # int b = 5;
 
-	.globl	c
-	.data
-	.align 4
-	.type	c, @object
-	.size	c, 4
-c:
-	.long	5
+	movl	$0, %eax # return 0; 函数的返回值存储在 eax 寄存器中
 
-	.align 4
-	.type	d, @object
-	.size	d, 4
-d:
-	.long	8
-
-	.section	.rodata
-	.align 4
-	.type	e, @object
-	.size	e, 4
-e:
-	.long	10
-
-	.globl	array
-	.bss
-	.align 4
-	.type	array, @object
-	.size	array, 20
-array:
-	.zero	20
-
-	.globl	iarray
-	.data
-	.align 4
-	.type	iarray, @object
-	.size	iarray, 20
-iarray:
-	.long	1
-	.long	2
-	.long	3
-	.long	4
-	.long	5
-
-	.globl	message
-	.align 4
-	.type	message, @object
-	.size	message, 13
-message:
-	.string	"hello world\n"
+	leave # 恢复栈顶指针
+	ret # 函数返回
+	.size	main, .-main
 	.ident	"GCC: (GNU) 11.1.0"
 	.section	.note.GNU-stack,"",@progbits

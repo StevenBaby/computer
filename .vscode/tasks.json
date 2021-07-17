@@ -5,6 +5,7 @@
             "label": "C/C++: gcc build active file",
             "command": "/usr/bin/gcc",
             "args": [
+                "-m32",
                 "-g",
                 "${file}",
                 "-o",
