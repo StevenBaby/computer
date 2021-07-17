@@ -3,6 +3,7 @@ CFLAGS:= -m32 \
 		 -fno-asynchronous-unwind-tables \
 		 -fno-pic \
 		 -mpreferred-stack-boundary=2 \
+		 -fno-stack-protector \
 		-O0
 
 .PHONY: hello.s
