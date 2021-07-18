@@ -1,19 +1,18 @@
 	.file	"hello.c"
-	.intel_syntax noprefix
 	.text
 	.section	.rodata
 .LC0:
-	.string	"hello world!!!"
+	.string	"hello world!!!\n"
 	.text
 	.globl	main
 	.type	main, @function
 main:
-	push	ebp
-	mov	ebp, esp
-	push	OFFSET FLAT:.LC0
-	call	puts
-	add	esp, 4
-	mov	eax, 0
+	pushl	%ebp
+	movl	%esp, %ebp
+	pushl	$.LC0
+	call	printf
+	addl	$4, %esp
+	movl	$0, %eax
 	leave
 	ret
 	.size	main, .-main
