@@ -32,7 +32,7 @@ Position Independent Code / 位置无关的代码
 
     andl	$-16, %esp
 
-将栈对齐到 16 位
+将栈对齐到 16 字节
 
     -mpreferred-stack-boundary=2
 
