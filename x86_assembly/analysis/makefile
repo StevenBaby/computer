@@ -6,6 +6,7 @@ CFLAGS:= -m32 \
 		 -mpreferred-stack-boundary=2 \
 		 -fno-stack-protector \
 		 -fno-builtin \
+		#  -fverbose-asm \
 
 
 .PHONY: hello.s
