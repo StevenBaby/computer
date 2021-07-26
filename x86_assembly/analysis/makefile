@@ -7,6 +7,7 @@ CFLAGS:= -m32 \
 		 -mpreferred-stack-boundary=2 \
 		 -fno-stack-protector \
 		 -fno-builtin \
+		 -fomit-frame-pointer \
 		#  -fverbose-asm \
 
 CC:=gcc
@@ -27,3 +28,19 @@ test.s: test.c
 
 %.s: %.c
 	gcc $(CFLAGS) -S $< -o $@
+
+DEBUG:=-g
+
+%.o: %.asm
+	nasm -f elf32 $(DEBUG) $< -o $@
+
+%.o: %.c
+	gcc $(CFLAGS) $(DEBUG) -c $< -o $@
+
+call.out: call.o subcall.o
+	gcc $(CFLAGS) $(DEBUG) $^ -o $@
+
+.PHONY:clean
+clean:
+	rm -rf *.o
+	rm -rf *.out
