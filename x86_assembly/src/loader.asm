@@ -1,6 +1,6 @@
 [org 0x1000]
 
-xchg bx, bx
+; xchg bx, bx
 
 check_memory:
     mov ax, 0
@@ -43,7 +43,7 @@ check_memory:
 
 
 prepare_protect_mode:
-    xchg bx, bx
+    ; xchg bx, bx
 
     cli ; 关闭中断
 
@@ -74,17 +74,22 @@ protect_enable:
 
     mov esp, 0x10000
 
-    xchg bx, bx
-
     call setup_page
 
     xchg bx, bx
 
-    mov byte [0xC00b8000], 'P'
+    call load_kernel
 
-    xchg bx, bx
+    jmp code_selector: 0x11000
 
     jmp $
+
+load_kernel:
+    mov edi, 0x10000
+    mov ecx, 10
+    mov bl, 100
+    call read_disk
+    ret
 
 PDE equ 0x2000
 PTE equ 0x3000
@@ -141,6 +146,88 @@ setup_page:
     mov byte [eax + esi], 0
     inc esi
     loop .set
+    ret
+
+read_disk:
+    ; 读取硬盘
+    ; edi - 存储内存位置
+    ; ecx - 存储起始的扇区位置
+    ; bl - 存储扇区数量
+    pushad; ax, cx, dx, bx, sp, bp, si, di
+    ; pushad; ax, cx, dx, bx, sp, bp, si, di
+
+    mov dx, 0x1f2
+    mov al, bl
+    out dx, al; 设置扇区数量
+
+    mov al, cl
+    inc dx; 0x1f3
+    out dx, al; 起始扇区位置低八位
+
+    shr ecx, 8
+    mov al, cl
+    inc dx; 0x1f4
+    out dx, al; 起始扇区位置中八位
+
+    shr ecx, 8
+    mov al, cl
+    inc dx; 0x1f5
+    out dx, al; 起始扇区位置高八位
+
+    shr ecx, 8
+    and cl, 0b1111
+
+    inc dx; 0x1f6
+    mov al, 0b1110_0000
+    or al, cl
+    out dx, al
+
+    inc dx; 0x1f7
+    mov al, 0x20; 读硬盘
+    out dx, al
+
+    xor ecx, ecx
+    mov cl, bl
+
+.read:
+    push cx
+    call .waits
+    call .reads
+    pop cx 
+    loop .read
+
+    popad
+    ; popa
+
+    ret
+
+
+.waits:
+    mov dx, 0x1f7
+    .check:
+        nop
+        nop
+        nop ; 一点延迟
+
+        in al, dx
+        and al, 0b1000_1000
+        cmp al, 0b0000_1000
+        jnz .check
+    ret
+
+.reads:
+    mov dx, 0x1f0
+    mov cx, 256; 一个扇区 256 个字
+    .readw:
+        nop
+        nop
+        nop
+
+        in ax, dx
+        mov [edi], ax
+        add edi, 2
+
+        loop .readw
     ret
 
 code_selector equ (1 << 3)
