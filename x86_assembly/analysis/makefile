@@ -34,8 +34,17 @@ DEBUG:=-g
 %.o: %.asm
 	nasm -f elf32 $(DEBUG) $< -o $@
 
-%.o: %.c
-	gcc $(CFLAGS) $(DEBUG) -c $< -o $@
+# %.o: %.c
+# 	gcc $(CFLAGS) $(DEBUG) -c $< -o $@
+
+%.c: %.cc
+	gcc $(CFLAGS) $(DEBUG) -E $< -o $@
+
+%.o: %.s
+	as -32 $< -o $@
+
+%.out: %.o
+	ld -m elf_i386 -static $< -o $@ -e main
 
 call.out: call.o subcall.o
 	gcc $(CFLAGS) $(DEBUG) $^ -o $@
