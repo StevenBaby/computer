@@ -46,3 +46,4 @@ clean:
 	rm -rf build/bx_enh_dbg.ini
 	rm -rf build/master.img
 	rm -rf build/*.bin
+	rm -rf build/*.o
