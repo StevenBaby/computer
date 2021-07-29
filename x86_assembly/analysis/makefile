@@ -34,19 +34,23 @@ DEBUG:=-g
 %.o: %.asm
 	nasm -f elf32 $(DEBUG) $< -o $@
 
-# %.o: %.c
-# 	gcc $(CFLAGS) $(DEBUG) -c $< -o $@
+%.o: %.c
+	gcc $(CFLAGS) $(DEBUG) -c $< -o $@
 
 %.c: %.cc
 	gcc $(CFLAGS) $(DEBUG) -E $< -o $@
 
-%.o: %.s
-	as -32 $< -o $@
+# %.o: %.s
+# 	as -32 $< -o $@
 
 %.out: %.o
-	ld -m elf_i386 -static $< -o $@ -e main
+	# ld -m elf_i386 -static $< -o $@ -e main
+	gcc $(CFLAGS) $(DEBUG) $< -o $@ 
 
 call.out: call.o subcall.o
+	gcc $(CFLAGS) $(DEBUG) $^ -o $@
+
+cstring.out: cstring.o astring.o
 	gcc $(CFLAGS) $(DEBUG) $^ -o $@
 
 .PHONY:clean
