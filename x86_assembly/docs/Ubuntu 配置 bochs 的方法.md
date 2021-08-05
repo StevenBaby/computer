@@ -23,7 +23,7 @@
 
 然后创建虚拟磁盘，输入命令
 
-    bximage -q -hd=16 -mode=create -sectsize=512 -imgmode=flat master.img
+    bximage -hd -mode="flat" -size=60 -q master.img
 
 这样就可以创建一个 16M 的硬盘。
 
