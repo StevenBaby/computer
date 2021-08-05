@@ -12,3 +12,4 @@ x86_assembly/bochs/bochs-2.6.11*
 
 *.o
 *.out
+*.bin

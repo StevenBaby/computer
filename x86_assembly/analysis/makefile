@@ -43,6 +43,9 @@ DEBUG:=-g
 # %.o: %.s
 # 	as -32 $< -o $@
 
+%.bin: %.asm
+	nasm $(DEBUG) $< -o $@
+
 %.out: %.o
 	# ld -m elf_i386 -static $< -o $@ -e main
 	gcc $(CFLAGS) $(DEBUG) $< -o $@ 
@@ -57,3 +60,4 @@ cstring.out: cstring.o astring.o
 clean:
 	rm -rf *.o
 	rm -rf *.out
+	rm -rf *.bin
