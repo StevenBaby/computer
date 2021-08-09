@@ -2,9 +2,9 @@
 
 Binary Coded Decimal / 二进制编码的十进制数
 
-int ;
+int ; // 除十取余
 
-char number[10]; // 0x30 + 0 = 0 0x31 
+char number[10000]; // 0x30 + 0 = 0 0x31 
 
 - 不打包的 BCD 码 / 一个字节表示一个十进制位
 - 打包的 BCD 码 / 一个字节表示两个十进制位
@@ -156,3 +156,6 @@ loop1:
     ret
 ```
 
+## AF 标记
+
+用于调整打包的 BCD 码
