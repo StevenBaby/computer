@@ -36,6 +36,7 @@ int main(int argc, char const *argv[])
     dest.present = 1;     // 在内存中
     dest.DPL = 0;         // 最高权限
     dest.segment = 1;     // 数据段
+    dest.available = 0;   // 0
     dest.type = 0b0010;   // 可写数据段向上扩展
 
     char *ptr = (char *)&dest;
