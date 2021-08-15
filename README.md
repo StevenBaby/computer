@@ -21,3 +21,10 @@
 - [Ubuntu 配置 bochs 的方法](./x86_assembly/docs/Ubuntu%20配置%20bochs%20的方法.md) 感谢 [@烟花笑寂寞](https://github.com/1126zk)
 
 - [参考资料](./x86_assembly/docs/参考资料.md)
+
+
+## Linux 源码分析
+
+- <https://github.com/StevenBaby/alinux>
+
+Working on it, coming soon.....
