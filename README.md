@@ -7,7 +7,7 @@
 
 ![snapshot](./cpu/snapshot.jpg)
 
-- [相关 bilibili 频道](https://space.bilibili.com/491131440/channel/detail?cid=163546)
+- [相关 bilibili 视频](https://www.bilibili.com/video/BV1aP4y1s7Vf)
 
 - [LogicCircuit](http://www.logiccircuit.org/)
 
@@ -16,7 +16,7 @@
 
 > 不同视频的代码请查看 git commit 历史。
 
-- [相关 bilibili 频道](https://space.bilibili.com/491131440/channel/detail?cid=181943)
+- [相关 bilibili 视频](https://www.bilibili.com/video/BV1b44y1k7mT)
 
 - [Ubuntu 配置 bochs 的方法](./x86_assembly/docs/Ubuntu%20配置%20bochs%20的方法.md) 感谢 [@烟花笑寂寞](https://github.com/1126zk)
 
