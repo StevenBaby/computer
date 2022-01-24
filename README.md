@@ -28,8 +28,6 @@
 
 ![](./snapshots/onix.jpg)
 
-Coming soon...
-
 ## Linux 源码分析
 
 - <https://github.com/StevenBaby/alinux>
